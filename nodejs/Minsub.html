@@ -1,0 +1,181 @@
+        <div class="text-center" style="padding : 0 0 0 0 ;">
+            <br>
+            <br>
+            
+            <p style="font-size : 1.5em; color : BLACK">MinSub</p>
+            
+        
+            </div>
+
+
+
+
+<DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd\">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MQTT Data - Real Time</title>
+<script src="Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="jquery/iphone-style-checkboxes.js"></script>
+<script src="jquery/iphone-style-checkboxes.js"></script>
+  <script
+    src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+    crossorigin="anonymous"></script>
+<link rel="stylesheet" href="style.css">
+
+<style>
+    canvas{
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+</style>
+</head>
+<body>
+    <div style="width:75%;">
+        <canvas id="canvas"></canvas>
+    </div>
+	<table>
+        <thead>
+		<tr>
+			<th width="200px">vector</th>
+			<th width="200px">x_rotation</th>
+			<th width="200px">y_rotation</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td width="200px"><a style="text-align:center" id="vector_id"></a></td>
+			<td width="200px"><a style="text-align:center"id="x_rotation_id"></a></td>
+			<td width="200px"><a style="text-align:center"id="y_rotation_id"></a></td>
+		</tr>
+	</tbody>
+	</table>
+
+
+<script>
+        window.chartColors = {
+         red: 'rgb(255, 99, 132)',
+         orange: 'rgb(255, 159, 64)',
+         yellow: 'rgb(255, 205, 86)',
+         green: 'rgb(75, 192, 192)',
+         blue: 'rgb(54, 162, 235)',
+         purple: 'rgb(153, 102, 255)',
+         grey: 'rgb(231,233,237)'
+        };
+        var count = 0;
+        var TIMES = [" "];
+        var config = {
+            type: 'line',
+            data: {
+                labels: [" "],
+                datasets: [{
+                    label: "vector",
+                    backgroundColor: window.chartColors.red,
+                    borderColor: window.chartColors.red,
+                    data: [0],
+                    fill: false,
+                }, {
+                    label: "x_rotation",
+                    fill: false,
+                    backgroundColor: window.chartColors.blue,
+                    borderColor: window.chartColors.blue,
+                    data: [0],
+                },{
+                    label: "y_rotation",
+                    fill: false,
+                    backgroundColor: window.chartColors.green,
+                    borderColor: window.chartColors.green,
+                    data: [0],
+                }]
+            },
+            options: {
+                scaleSteps : 10,
+                scaleOverride : true,
+                scaleStepWidth : 10,
+                scaleStartValue : 0,
+                responsive: true,
+                title:{
+                    display:true,
+                    text:'Chart.js Line Chart'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Value'
+                        }
+                    }]
+                }
+            }
+        };
+</script>
+<script>
+
+  var socket = io.connect('http://192.168.0.7:5000');
+    socket.on('connect', function () {
+	    socket.on('mqtt', function (msg) {
+	    console.log(msg.topic+' '+msg.payload);
+
+
+	    var strArray = msg.payload.split('*');
+
+	    var vector = strArray[0];
+	    var x_rotation = strArray[1];
+	    var y_rotation = strArray[2];
+	    var time = strArray[3];
+	    console.log(vector);
+            $('#vector_id').empty();
+            $('#vector_id').append("<a>"+vector+"</a>");
+	    $('#x_rotation_id').empty();
+	    $('#x_rotation_id').append("<a>"+x_rotation+"</a>");
+	    $('#y_rotation_id').empty();
+	    $('#y_rotation_id').append("<a>"+y_rotation+"</a>");
+	    count++;
+	    if(count > 20)
+	    {
+	      config.data.labels.shift();
+	      config.data.datasets[0].data.shift();
+	      config.data.datasets[1].data.shift();
+	      config.data.datasets[2].data.shift();
+	      count = 21;
+	    }
+	    config.data.labels.push(time);
+	    config.data.datasets[0].data.push(vector);
+	    config.data.datasets[1].data.push(x_rotation);
+	    config.data.datasets[2].data.push(y_rotation);
+   		 window.myLine.update();
+
+	    });
+ 	   socket.emit('subscribe',{topic:'Minsub'});
+ 	   });
+    window.onload = function() {
+            var ctx = document.getElementById("canvas").getContext("2d");
+            window.myLine = new Chart(ctx, config);
+	    //console.log($('#vector_id').text());
+	    //console.log(vector);
+	    //$('#vector_id').append(vector);
+
+    };
+    </script>
+ </body>
+</html>
