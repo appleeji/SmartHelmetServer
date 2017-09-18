@@ -205,7 +205,7 @@
 
     map.addOverlayMapTypeId(daum.maps.MapTypeId.TRAFFIC);  
 
-    var socket = io.connect('http://192.168.0.56:5000');
+    var socket = io.connect('http://1.214.233.64:5000');
     socket.on('connect', function () {
         socket.on('mqtt', function (msg) {
             console.log(msg.topic + ' ' + msg.payload);

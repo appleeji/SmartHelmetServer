@@ -6,7 +6,7 @@ var mqtt = require('mqtt');
 var io = require('socket.io').listen(5000);
 
 // create an mqtt client object and connect to the mqtt broker
-var client = mqtt.connect('mqtt://1.214.233.64');
+var client = mqtt.connect('mqtt://192.168.0.56');
 
 console.log('aaaa');
 io.sockets.on('connection', function (socket) {

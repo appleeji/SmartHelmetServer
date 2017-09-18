@@ -201,7 +201,7 @@
 </script>
 <script>
 
-    var socket = io.connect('http://192.168.0.7:5000');
+    var socket = io.connect('http://192.168.0.56:5000');
     socket.on('connect', function () {
         socket.on('mqtt', function (msg) {
             console.log(msg.topic + ' ' + msg.payload);
